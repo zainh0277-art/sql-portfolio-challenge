@@ -1,10 +1,39 @@
 -- Task 1: Real-Time Executive Revenue Dashboard (VIEW) Scenario: Corporate board meetings mein CEO aur CFO roz subah uth kar complex multi-table joins nahi chalana chahte. Unhein aik ready-made virtual table chahiye jise call karte hi live company status samne aa jaye. Requirement: Aik VIEW banao jiska naam ho vw_executive_revenue_dashboard. Logic: Yeh view jab bhi SELECT kiya jaye, yeh har product ka product_id, product_name, bechi gayi kul total quantity, aur generate hone wala kul gross sales revenue (quantity * unit_price ka sum) live tables se calculate kar ke display kare.
 -- Solution:
---Task 2: Automated Inventory Safeguard (BEFORE INSERT TRIGGER) Scenario: Agar warehouse mein kisi item ka stock sirf 5 bacha hai, aur koi operator ghalti se 10 items ka order insert karne lagay, tu database ko us order ko wahin rok dena chahiye! Requirement: order_items table par aik BEFORE INSERT trigger aur trigger function deploy karo. Logic: Jab bhi koi naya row insert hone lagay, trigger pehle products table mein jaye aur check kare ke demanded quantity available stock_quantity se zyada tu nahi? Agar stock kam ho, tu trigger entry ko block kar de aur custom database error throw kare: 'ERROR: Out of stock or insufficient inventory!'.
+CREATE VIEW vw_executive_revenue_dashboard AS
+    SELECT
+        p.product_id,
+        p.product_name,
+        SUM(oi.quantity) AS total_quantity_sold,
+        SUM(oi.quantity * oi.unit_price) AS total_gross_sales_revenue
+    FROM
+        products p
+        LEFT JOIN order_items oi ON p.product_id = oi.product_id
+    GROUP BY
+        p.product_id,
+        p.product_name
+    ORDER BY
+        total_gross_sales_revenue DESC;
+-- How to test: 
+SELECT * FROM vw_executive_revenue_dashboard;
+-- Task 2: Automatic Stock Deduction Radar (AFTER INSERT TRIGGER Scenario: Jab order item table mein successfully entry ho jaye, tu warehouse ke stock mein se utni quantity khud-ba-khud minus ho jani chahiye taake manual updates na karni paren. Requirement: order_items table par aik AFTER INSERT trigger aur trigger function banao. Logic: Jaise hi order successfully insert ho, yeh trigger automatic piche products table par aik UPDATE query chalaye jo us specific product_id ki stock_quantity ko beche gaye units ke mutabiq decrease (minus) kar de.
 -- Solution:
--- Task 3: Automatic Stock Deduction Radar (AFTER INSERT TRIGGER Scenario: Jab order item table mein successfully entry ho jaye, tu warehouse ke stock mein se utni quantity khud-ba-khud minus ho jani chahiye taake manual updates na karni paren. Requirement: order_items table par aik AFTER INSERT trigger aur trigger function banao. Logic: Jaise hi order successfully insert ho, yeh trigger automatic piche products table par aik UPDATE query chalaye jo us specific product_id ki stock_quantity ko beche gaye units ke mutabiq decrease (minus) kar de.
--- Solution:
--- Task 4: Dynamic Corporate Tax Calculator (DATABASE FUNCTION) Scenario: Finance department ko har bar product pricing aur sales calculate karte waqt standard 16% Corporate Sales Tax (GST) manually calculate karna parta hai. Requirement: Aik custom PostgreSQL function/stored procedure banao jiska naam ho fn_calculate_taxed_total(qty INT, price DECIMAL). Logic: Yeh function input mein integer quantity aur decimal unit price le, dono ko multiply kare, us par 16% tax amount mazeed add kare, aur final total return kare. (Phir isay check karne ke liye kisi bhi test query mein call kar ke dekho).
--- Solution:
--- Task 5: Dynamic Transaction Logger Stored Procedure (STORED PROCEDURE) Scenario: Jab bhi finance team store_financials table mein koi naya capital invest kare ya expense record kare, tu unhein seedha manually INSERT chalane ke bajaye aik secure pipeline chahiye jo description ko khud sanitize kare. Requirement: Aik STORED PROCEDURE banao jiska naam ho sp_log_financial_transaction. Logic: Yeh procedure input parameters mein transaction ke saare details le (date, type, amount, description). Jab yeh procedure run ho, tu yeh table mein row insert karne ke sath-sath, description ke aakhir mein automatic current timestamp concat kar de: '[Transaction Logged on ' || CURRENT_TIMESTAMP || ']'.
--- Solution:
+CREATE OR REPLACE FUNCTION fn_deduct_stock_after_order_insert()
+RETURNS TRIGGER AS $$
+BEGIN
+    UPDATE products
+    SET stock_quantity = stock_quantity - NEW.quantity
+    WHERE product_id = NEW.product_id;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+-------------------------------------------------------------------
+CREATE TRIGGER trg_deduct_stock_after_order_insert
+AFTER INSERT ON order_items
+FOR EACH ROW
+EXECUTE FUNCTION fn_deduct_stock_after_order_insert();
+-------------------------------------------------------------------
+-- Test:
+SELECT * FROM products WHERE product_id = 1; -- Check stock before
+INSERT INTO order_items (order_item_id, order_id, product_id, quantity, unit_price) VALUES (1, 1, 2, 10,99.87); -- Insert order item
+SELECT * FROM products WHERE product_id = 1; -- Check stock after
