@@ -1,0 +1,11 @@
+-- 1. The High-Paying DepartmentsBusiness Case: HR wants to identify elite departments.
+-- Find the departments whose average base pay is higher than the global average base pay of the entire company.Your Task: Group by department, calculate the average base pay, and use a subquery in the HAVING clause to filter out any departments falling below the company-wide average.
+-- 2. Overpopulated Job TitlesBusiness Case: Workforce planning needs to know which roles are highly saturated. 
+-- Find the job titles that have a headcount greater than the average headcount across all job titles.Your Task: Group by job title, count the employees, and use a subquery in the HAVING clause to calculate the average headcount per job title to use as your benchmark.
+-- 3. Above-Average Overtime DepartmentsBusiness Case: Operations wants to flag departments that are relying too heavily on overtime. 
+-- Find departments where the average overtime pay is strictly greater than the average overtime pay of the entire company.
+-- Your Task: Group by department, calculate average overtime, and filter using a subquery in the HAVING clause that finds the global average overtime.
+-- 4. Departments Beating Terminated StandardsBusiness Case: Find departments where the average base pay of active employees is higher than the maximum base pay ever given to a terminated employee.
+-- Your Task: Group active employees by department, calculate their average base pay, and in the HAVING clause, use a subquery to find the MAX(base_pay) of employees whose status is 'Terminated'.
+-- 5. Small-Team Budget OutliersBusiness Case: Finance is looking for departments with 5 or fewer employees, but whose total payroll budget (base pay + benefits) is larger than the average total payroll budget of all departments.
+-- Your Task: Group by department, filter for employee counts $\le 5$, and use a subquery in the HAVING clause to calculate the average total budget across all departments.
