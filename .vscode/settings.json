@@ -49,6 +49,16 @@
             "name": "postgres",
             "database": "hr_payroll_db",
             "username": "postgres"
+        },
+        {
+            "ssh": "Disabled",
+            "previewLimit": 50,
+            "server": "localhost",
+            "port": 5432,
+            "driver": "PostgreSQL",
+            "name": "postgres",
+            "database": "hospital_appointment_system_db",
+            "username": "postgres"
         }
     ]
 }
