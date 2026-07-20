@@ -1,4 +1,4 @@
--- Task 1: Real-Time Executive Revenue Dashboard (VIEW) Scenario: Corporate board meetings mein CEO aur CFO roz subah uth kar complex multi-table joins nahi chalana chahte. Unhein aik ready-made virtual table chahiye jise call karte hi live company status samne aa jaye. Requirement: Aik VIEW banao jiska naam ho vw_executive_revenue_dashboard. Logic: Yeh view jab bhi SELECT kiya jaye, yeh har product ka product_id, product_name, bechi gayi kul total quantity, aur generate hone wala kul gross sales revenue (quantity * unit_price ka sum) live tables se calculate kar ke display kare.
+-- Task 1: Real-Time Executive Revenue Dashboard (VIEW) Scenario: Corporate board meetings require immediate access to high-level financial metrics without requiring the CEO and CFO to run complex, multi-table joins every morning. They need a ready-made virtual table that surfaces live company health statistics instantly upon execution. Requirement: Create a VIEW named vw_executive_revenue_dashboard that, whenever queried, dynamically calculates and displays each product's ID, name, total aggregated units sold, and absolute gross sales revenue (sum of quantity multiplied by unit price) directly from active ledger tables.
 -- Solution:
 CREATE VIEW vw_executive_revenue_dashboard AS
     SELECT
@@ -14,9 +14,11 @@ CREATE VIEW vw_executive_revenue_dashboard AS
         p.product_name
     ORDER BY
         total_gross_sales_revenue DESC;
+
 -- How to test: 
 SELECT * FROM vw_executive_revenue_dashboard;
--- Task 2: Automatic Stock Deduction Radar (AFTER INSERT TRIGGER Scenario: Jab order item table mein successfully entry ho jaye, tu warehouse ke stock mein se utni quantity khud-ba-khud minus ho jani chahiye taake manual updates na karni paren. Requirement: order_items table par aik AFTER INSERT trigger aur trigger function banao. Logic: Jaise hi order successfully insert ho, yeh trigger automatic piche products table par aik UPDATE query chalaye jo us specific product_id ki stock_quantity ko beche gaye units ke mutabiq decrease (minus) kar de.
+
+-- Task 2: Automatic Stock Deduction Radar (AFTER INSERT TRIGGER) Scenario: To eliminate manual administrative errors and keep multi-location inventory counts accurate, warehouse stock quantities must immediately adjust whenever an item transaction is confirmed. Requirement: Develop an AFTER INSERT database trigger and an accompanying trigger function on the order_items table. Logic: The moment a new transaction row is added, the trigger must execute an automated background UPDATE on the products table to systematically decrease the target product's stock_quantity by the specific number of units sold.
 -- Solution:
 CREATE OR REPLACE FUNCTION fn_deduct_stock_after_order_insert()
 RETURNS TRIGGER AS $$

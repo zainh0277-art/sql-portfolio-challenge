@@ -1,4 +1,4 @@
--- Question 1: High-Risk User Audit Requirement: Compliance team ko un tamam users ki list chahiye jo Pakistan se hain, lekin unho ne profile banate waqt apna email ya phone number database mein missing (NULL) chora hai. List ko joined_date ke hisab se latest upar rakhte huay sort karein.
+-- Question 1: High-Risk User Audit Requirement: Compliance team requires a list of all registered users located in Pakistan who omitted either their email address or phone number during profile creation. The list must be sorted to prioritize the most recently registered accounts first.
 -- Solution:
 SELECT
     user_id,
@@ -11,15 +11,17 @@ WHERE
     country = 'Pakistan' AND (email IS NULL OR phone IS NULL)
 ORDER BY
     joined_date DESC;
--- Question 2: Clean Profile Report (COALESCE Practice) Requirement: Ek aisi clean report nikalen jahan customer ka name aur unka phone number show ho. Agar phone number database mein NULL hai, tu uski jagah text 'Landline/No Phone' display hona chahiye taake report gandi na lage.
+
+-- Question 2: Clean Profile Report (COALESCE Practice) Requirement: Customer Relations team needs a contact list displaying usernames and phone numbers. To ensure clean formatting and maintain professional reporting standards, any missing phone number must dynamically display as 'Landline/No Phone'.
 -- Solution:
 SELECT
     user_id,
     username,
-    COALESCE(phone, 'NO Phone Provided') AS phone_number
+    COALESCE(phone, 'Landline/No Phone') AS phone_number
 FROM
     users;    
--- Question 3: Under-the-Radar Financial Anomalies (Wildcards & Absolute Values) Requirement: Audit team ko store_financials table mein kuch mashkook transactions check karni hain. Un saare records ko filter karo jinki description ke andar lafzi tor par 'Audit' ya 'Tax' aata ho (chahe choti abc mein ho ya bari mein) aur unka loss/expense amount $50 se $500 ke darmiyan ho.
+
+-- Question 3: Under-the-Radar Financial Anomalies (Wildcards & Absolute Values) Requirement: Corporate Audit team is investigating minor financial irregularities. Filter all ledger records where the transaction description explicitly contains the words 'Audit' or 'Tax' (case-insensitive) and the financial loss or expense amount falls strictly between $50 and $500.
 -- Solution:
 SELECT
     financial_id,
@@ -29,12 +31,12 @@ SELECT
 FROM
     store_financials
 WHERE
-    description ILIKE '%audit%' OR description ILIKE '%tax%'
+    (description ILIKE '%audit%' OR description ILIKE '%tax%')
     AND amount BETWEEN -500 AND -50
 ORDER BY
     amount ASC;
 
--- Question 4: Inventory Alert (Low Stock & Out of Stock) Requirement: Warehouse manager ko un items ki report chahiye jinka stock ya tu bilkul khatam ho chuka hai (stock_quantity = 0), ya phir unka stock critical level par hai (stock_quantity 1 se 20 ke darmiyan hai). Critical stock wale items pehle show hone chahiye.
+-- Question 4: Inventory Alert (Low Stock & Out of Stock) Requirement: Warehouse Logistics Manager needs an inventory depletion report pinpointing items that are completely out of stock (quantity = 0) or sitting at critical levels (quantity between 1 and 20 units). Critical stock items must be prioritized and displayed before out-of-stock items.
 -- Solution:
 SELECT
     product_id,
@@ -50,11 +52,12 @@ WHERE
     stock_quantity = 0 OR stock_quantity BETWEEN 1 AND 20
 ORDER BY
     CASE
-        WHEN stock_quantity BETWEEN 1 AND 20 THEN 'Low Stock'
-        WHEN stock_quantity = 0 THEN 'Out of Stock'
+        WHEN stock_quantity BETWEEN 1 AND 20 THEN 1
+        WHEN stock_quantity = 0 THEN 2
     END,
     stock_status DESC;
--- Question 5: Financial Risk Tracker (Large Expenses) Requirement: store_financials table se un saare operational expenses ki list nikalen jahan company ka $100 se zyada ka kharcha hua ho. Yaad rahe expenses ka amount negative mein save hota hai, tu filter dhyan se lagana aur sab se bade kharche ko top par rakhna.
+
+-- Question 5: Financial Risk Tracker (Large Expenses) Requirement: Finance Department requires a breakdown of high-value operational expenses where the company spent more than $100 in a single transaction. Since expenses are recorded as negative values, filter appropriately and rank the largest absolute cash outflows at the top.
 -- Solution:
 SELECT
     financial_id,
@@ -67,7 +70,8 @@ WHERE
     transaction_type = 'Expense' AND amount < -100
 ORDER BY
     ABS(amount) DESC;
--- Question 6: International Fraud Control & Non-Standard Emails Requirement: Risk audit team un fake profiles ko spot karna chahti hai jinhon ne business leakage ki hai. Ek aisi query likho jo un users ka user_id, username, aur email nikale jo Pakistan ya India se NAHI hain, jinki email address exact gmail.com ya yahoo.com par NAHI bani hui (e.g., junk extensions), aur unho ne saal 2025 ke baad join kiya ho.
+
+-- Question 6: International Fraud Control & Non-Standard Emails Requirement: Risk Audit team wants to isolate potential fake user profiles to prevent business data leakage. Extract the user_id, username, and email of all users who are NOT from Pakistan or India, whose email addresses do NOT end with standard domains like @gmail.com or @yahoo.com, and who registered after the year 2025.
 -- Solution:
 SELECT
     user_id,
@@ -80,19 +84,21 @@ WHERE
     AND email NOT LIKE '%@gmail.com'
     AND email NOT LIKE '%@yahoo.com'
     AND joined_date > '2025-12-31';
--- Question 7: Projections on Planned Appraisals (Salary Math & Offsets) Requirement: HR Department saalana budget ready kar raha hai. Unhein dekhna hai ke agar har employee ki salary mein 14% ka increment kiya jaye (salary * 1.14), aur sath mein $500 ka flat allowance bonus diya jaye, tu kin kin employees ki estimated new salary $85,000 ko cross kar jayegi? Output columns: Full Name, Current Salary, aur Projected Salary.
+
+-- Question 7: Projections on Planned Appraisals (Salary Math & Offsets) Requirement: HR Department is drafting the annual compensation budget. They need to model a scenario where every employee receives a 14% salary hike along with a flat $500 allowance bonus, and identify which specific employees will see their projected total compensation exceed $85,000.
 -- Solution:
 SELECT
     first_name || ' ' || last_name AS Full_name,
     salary AS Current_Salary,
-    ROUND((salary * 1.14 + 500),2) AS Projected_Salary
+    ROUND((salary * 1.14 + 500), 2) AS Projected_Salary
 FROM
     employees
 WHERE
     (salary * 1.14 + 500) > 85000
 ORDER BY
     Projected_Salary DESC;
--- Question 8: Executive Formatting Clean-up (Advanced String Control) Requirement: Database mein data standardization ka issue hai. Ek query likho jahan first_name mukammal UPPERCASE (BARI ABC) mein ho, last_name mukammal lowercase (choti abc) mein ho, unka department sirf 'Sales', 'Marketing', ya 'Finance' ho, aur unki employee ID ek ODD number (taank adad, jaise 1, 3, 5...) ho.
+
+-- Question 8: Executive Formatting Clean-up (Advanced String Control) Requirement: Data Engineering team needs to clean and standardize employee records for an executive review. Generate a report where the first name is forced to complete uppercase, the last name is forced to complete lowercase, filtered only for the Sales, Marketing, and Finance departments, and restricted to odd-numbered employee IDs.
 -- Solution:
 SELECT
     UPPER(first_name) AS first_name_uppercase,
@@ -104,7 +110,8 @@ FROM
 WHERE
     department IN ('Sales', 'Marketing', 'Finance')
     AND employee_id % 2 = 1;
--- Question 9: Hidden Financial Anomalies (Wildcard Substring Search) Requirement: Tax investigators ko store_financials table mein kuch sensitive transactions audit karni hain. Un saare rows ka poora data filter karo jinki description ke andar lafzi tor par word 'Audit', 'Tax', ya 'Penalty' aata ho aur unka spending amount negative values mein $150 aur $750 ke darmiyan ho.
+
+-- Question 9: Hidden Financial Anomalies (Wildcard Substring Search) Requirement: Tax investigators require a complete data extract from the store financials ledger to perform a deep forensic audit. Filter all rows where the description contains the terms 'Audit', 'Tax', or 'Penalty' (case-insensitive) and the absolute spending amount ranges strictly between $150 and $750.
 -- Solution:
 SELECT
     financial_id,
@@ -117,7 +124,8 @@ FROM
 WHERE
     (description ILIKE '%audit%' OR description ILIKE '%tax%' OR description ILIKE '%penalty%')
     AND amount BETWEEN -750 AND -150;
--- Question 10: Dynamic Seniority Banding (CASE WHEN Date Control) Requirement: Business Operations team users ka retention pattern dekhna chahti hai. users table se ek report nikalo jismein user ka naam, country, aur ek custom calculated column ho retention_tier: Agar user ne saal 2024 se pehle join kiya tha, tu show ho 'OG Legacy'. Agar user ne saal 2024 ya 2025 mein join kiya, tu show ho 'Mid-Term Core'. Baki tamam naye users ke liye show ho 'Recent Acquisition'.
+
+-- Question 10: Dynamic Seniority Banding (CASE WHEN Date Control) Requirement: Business Operations team wants to analyze corporate user retention cohorts. Generate a user list categorizing tenures dynamically: users registering before 2024 must show as 'OG Legacy', users joining during 2024 or 2025 must show as 'Mid-Term Core', and all subsequent sign-ups must show as 'Recent Acquisition'.
 -- Solution:
 SELECT
     username,
@@ -129,4 +137,3 @@ SELECT
     END AS retention_tier
 FROM
     users;
--- Day 02 Completed.
