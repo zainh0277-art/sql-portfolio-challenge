@@ -1,0 +1,30 @@
+-- 1:List all patients whose sex = 'Female', sorted alphabetically by name.
+-- Solution:
+-- 2:Find all patients covered by "BioCrest Harmony" insurance.
+-- Solution:
+-- 3:Count how many patients are registered under each insurance provider, ordered from highest to lowest.
+-- Solution:
+-- 4:Find the 10 oldest patients by dob (earliest birth date first).
+-- Solution:
+-- 5:List all appointments with status = 'did not attend', ordered by appointment_date (most recent first).
+-- Solution:
+-- 6:Count the total number of appointments for each status value.
+-- Solution:
+-- 7:Find all appointments where age > 65, sorted by age descending.
+-- Solution:
+-- 8:Count how many appointments fall into each age_group, ordered from highest count to lowest.
+-- Solution:
+-- 9:Find the average waiting_time across all appointments (think about whether NULL rows affect this result).
+-- Solution:
+-- 10:Find all appointments where check_in_time IS NULL — what does this tell you about those appointments?
+-- Solution:
+-- 11:Find the appointment(s) with the longest appointment_duration.
+-- Solution:
+-- 12:List all appointments scheduled on a weekend (use a date function on appointment_date).
+-- Solution:
+-- 13:Find all slots where is_available = TRUE, grouped by appointment_date, showing the count of free slots per day.
+-- Solution:
+-- 14:Find the earliest and latest appointment_date in the slots table (the full date range your dataset covers).
+-- Solution:
+-- 15:Find all appointments where scheduling_interval > 30 (patients who booked more than a month in advance), sorted by scheduling_interval descending.
+-- Solution:
