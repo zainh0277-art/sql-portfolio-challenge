@@ -114,3 +114,4 @@ WHERE p.patient_id IN (
     HAVING COUNT(*) > 1
 )
 GROUP BY p.patient_id, p.name;
+-- Analysis Completed
