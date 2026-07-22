@@ -1,0 +1,41 @@
+-- Intermediate --
+-- Find the cancellation rate (is_canceled = TRUE as a percentage of total bookings) for each hotel_id, joined against hotels for the readable name.
+-- Solution:
+-- For each market_segment, find the average lead_time and average adr — which segment books furthest in advance, and which pays the most per night?
+-- Solution:
+-- Find the top 10 country values by booking count — but first decide how you're handling the 14 NULL countries in the result (excluded entirely? shown as 'Unknown'? your call, just be explicit about it).
+-- Solution:
+-- For each arrival_date month (extract month from the date), count total bookings and cancellations, and calculate the cancellation rate — is there a seasonal pattern?
+-- Solution:
+-- Find all bookings where total_of_special_requests >= 3, sorted by adr descending — are high-request guests also high-paying guests?
+-- Solution:
+-- Using CASE WHEN, bucket every booking's lead_time into 'Last minute (0-7 days)', 'Short (8-30)', 'Medium (31-90)', 'Long (90+)', then count bookings and cancellation rate in each bucket.
+-- Solution:
+-- Find the average days_in_waiting_list for bookings that were eventually cancelled vs. bookings that were not — does a longer wait correlate with cancellation?
+-- Solution:
+-- Hard --
+-- Find every deposit_type = 'Non Refund' booking that was still is_canceled = FALSE — a non-refundable deposit is meant to discourage cancellation, so check whether it's working, and separately check whether any Non Refund bookings were cancelled anyway.
+-- Solution:
+-- For each customer_type, calculate what percentage of bookings had agent IS NOT NULL (i.e., were booked through a travel agent) vs. booked directly — use COUNT(agent) vs COUNT(*) to see how NULL is silently excluded from COUNT(column).
+-- Solution:
+--Find the reserved_room_type and assigned_room_type combinations where they don't match — count how often each hotel reassigns guests to a different room type than they booked, and whether mismatched rooms have a higher cancellation rate.
+-- Solution:
+--For each country (excluding NULL), calculate the average adr, but only include countries with more than 50 bookings (HAVING) — avoid drawing conclusions from tiny sample sizes.
+-- Solution:
+--Find the busiest arrival_date_week_number for each hotel_id by total booking count — use a subquery or window-style approach to identify peak booking weeks per hotel without collapsing to one row per hotel manually.
+-- Solution:
+--Calculate the overall no-show rate (reservation_status = 'No-Show') as a percentage of all non-cancelled-in-advance bookings, broken down by hotel_id and customer_type together.
+-- Solution:
+--Find bookings where children > 0 or babies > 0, calculate their average total_of_special_requests compared to bookings with no children/babies — do families request more?
+-- Solution:
+--Using COALESCE, treat every NULL agent value as 0 (meaning "no agent"), then find the single agent number (real or the 0 placeholder) responsible for the most bookings per hotel_id.
+-- Solution:
+
+-- Specifically for NULL handling practice
+
+-- Run COUNT(*) vs COUNT(country) vs COUNT(agent) vs COUNT(company) on the whole table side by side — this single query shows you exactly how many rows each column is silently missing, without needing WHERE ... IS NULL at all.
+-- Solution:
+-- Find all bookings where company IS NOT NULL — since company is missing in over 95% of rows, these are the rare corporate-booked stays. Compare their average adr and lead_time against the rest of the table.
+-- Solution:
+-- Rewrite question 9 above using COALESCE(agent, -1) instead of relying on COUNT() behavior, and confirm you get the same grouping result both ways — a good check that you understand why both approaches agree here.
+-- Solution:
