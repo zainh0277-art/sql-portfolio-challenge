@@ -69,6 +69,16 @@
             "name": "postgres",
             "database": "hotel_booking_system_db",
             "username": "postgres"
+        },
+        {
+            "ssh": "Disabled",
+            "previewLimit": 50,
+            "server": "localhost",
+            "port": 5432,
+            "driver": "PostgreSQL",
+            "name": "postgres",
+            "database": "social_media_engagement_dataset_db",
+            "username": "postgres"
         }
     ]
 }
