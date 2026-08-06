@@ -26,6 +26,16 @@ WHERE c.comment_id IS NULL;
 -- Join comments to itself (self-join on parent_comment_id) to find every comment that has at least one reply, showing the original comment's body next to the reply's body.
 -- Solution:
 SELECT 
-
+    c1.comment_id AS original_comment_id, 
+    c2.comment_id AS reply_comment_id, 
+    c1.body AS original_comment_body, 
+    c2.body AS reply_comment_body 
+FROM comments c1 
+JOIN comments c2 ON c1.comment_id = c2.parent_comment_id;
 -- For each influencer_tier, calculate the total number of likes received across all their posts and the total number of posts — but only include tiers where the average likes per post exceeds 500 (HAVING on a calculated ratio).
 -- Solution:
+SELECT u.influencer_tier, SUM(p.likes_count) AS total_likes, COUNT(p.post_id) AS total_posts
+FROM users u
+JOIN posts p ON u.user_id = p.user_id
+GROUP BY u.influencer_tier
+HAVING AVG(p.likes_count) > 500;
