@@ -21,7 +21,7 @@ For each project, I create a separate folder containing 5 dedicated SQL files to
 * Project 4: Hospital Appointment System (4th Project Completed)
 * Project 5: Hotel Booking System (5th Project Completed)
 * Project 6: Social Media Platform Backend (6th Project Completed)
-* Project 7: Bank Account Management (Upcoming)
+* Project 7: Bank Account Management (In progres)
 * Project 8: Student Grading System (Upcoming)
 * Project 9: Movie Streaming Service (Upcoming)
 * Project 10: Supply Chain Inventory Management (Upcoming)
